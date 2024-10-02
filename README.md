@@ -1,0 +1,2 @@
+# Paytm Clone - MERN Stack
+This is a simple Paytm clone built using the MERN stack (MongoDB, Express, React, Node.js). The project simulates basic functionality such as user authentication, payments, and transaction history.
