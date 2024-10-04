@@ -25,7 +25,7 @@ userRouter.post("/signup", async (req, res) => {
             const userId = newUser._id;
             await Account.create({
                 userId,
-                balance: Math.floor(1 + Math.random() * 10)
+                balance: Math.floor(1 + Math.random() * 10000)
             })
             
             var hashedPassword = await newUser.createHash(user.data.password)
