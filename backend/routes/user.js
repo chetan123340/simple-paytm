@@ -1,6 +1,6 @@
 const express = require("express");
 const {userSigninZod, userSignupZod, updateUserZod} = require("../types");
-const { User } = require("../db");
+const { User, Account } = require("../db");
 require('dotenv').config()
 const JWT_SECRET = process.env.JWT_SECRET
 const jwt = require("jsonwebtoken");
@@ -23,6 +23,11 @@ userRouter.post("/signup", async (req, res) => {
                 lastname: user.data.lastname
             })
             const userId = newUser._id;
+            await Account.create({
+                userId,
+                balance: Math.floor(1 + Math.random() * 10)
+            })
+            
             var hashedPassword = await newUser.createHash(user.data.password)
             newUser.password = hashedPassword
 
@@ -65,6 +70,28 @@ userRouter.post("/signin", async (req, res) => {
     } catch (error) {
         console.log("routes :: userRouter :: signin :: error ::", error);
     }
+})
+
+userRouter.get("/bulk", (req, res)=>{
+    const filter = req.query.filter || ""
+
+    const users = User.find({
+        $or: [{
+            firstname: {
+                $regex: filter
+            },
+            lastname: {
+                $regex: filter
+            }
+        }]
+    })
+
+    res.json({user : users.map(user=>({
+        username: user.username,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        _id: user._id
+    }))})
 })
 
 userRouter.put("/", authMiddleware, async (req, res)=>{
