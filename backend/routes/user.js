@@ -8,6 +8,15 @@ const authMiddleware = require("../middleware");
 
 const userRouter = express.Router()
 
+userRouter.get("/me", authMiddleware, async (req, res)=>{
+    const user = await User.findOne({_id: req.userId})
+    if (user) {
+        return res.status(200).json(user)
+    } else {
+        return res.status(404).json({message: "User not found"})
+    }
+})
+
 userRouter.post("/signup", async (req, res) => {
     try {
         const user = userSignupZod.safeParse(req.body)
@@ -72,10 +81,10 @@ userRouter.post("/signin", async (req, res) => {
     }
 })
 
-userRouter.get("/bulk", (req, res)=>{
+userRouter.get("/bulk", async (req, res)=>{
     const filter = req.query.filter || ""
 
-    const users = User.find({
+    const users = await User.find({
         $or: [{
             firstname: {
                 $regex: filter
